@@ -1,0 +1,97 @@
+body #config {
+    display: flex;
+    flex-direction: column;
+    margin: 0 15px;
+    min-width: 200px;
+  }
+  
+  body #main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  body .collapsible {
+    width: 350px;
+  }
+  
+  body #timer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  
+  nav {
+    font-family: 'Pacifico', cursive;
+  }
+  
+  .nav-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+  
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+  
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  .input-field input[type=number]:focus+label {
+    color: #b71c1c !important;
+  }
+  
+  .input-field input[type=number]:focus {
+    border-color: #b71c1c !important;
+    box-shadow: 0 1px 0 0 #b71c1c !important;
+  }
+  
+  div#launched {
+    width: 350px;
+  }
+  
+  div#buttonPause {
+    display: flex;
+    justify-content: center;
+  }
+  
+  div#buttonPause button {
+    margin: 0 10px;
+  }
+  
+  span#timerDisplay {
+    font-size: 6em;
+    line-height: 0.75em;
+  }
+  
+  span#timerDisplay.victory {
+    font-size: 2.5em;
+    line-height: 1em;
+    text-align: center;
+  }
+  
+  span#timerRemainingWrapper {
+    display: flex;
+    align-items: center;
+    margin-top: 5px;
+  }
+  
+  span#timerRemainingWrapper i {
+    margin-right: 5px;
+  }
+  
+  div#timerBlinker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  * {
+    font-family: 'Signika Negative', sans-serif;
+  }
+  

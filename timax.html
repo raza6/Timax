@@ -1,0 +1,95 @@
+<html>
+
+  <head>
+    <link rel="stylesheet" href="timax.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Signika+Negative&display=swap" rel="stylesheet">
+  </head>
+
+  <body>
+    <nav class="red darken-4">
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo">Timax</a>
+      </div>
+    </nav>
+    <div id="main">
+      <div id="timer">
+        <div id="notLaunched">
+          <button id="launch" class="waves-effect waves-light btn red darken-4">
+            <i class="material-icons left">timer</i>
+            <span>
+              LAUNCH
+            </span>
+          </button>
+        </div>
+        <div class="card" id="launched" hidden>
+          <div class="card-content" id="timerBlinker">
+            <span class="card-title" id="timerDisplay"></span>
+            <span id="timerRemainingWrapper">
+              <i class="material-icons">update</i><span id="timerRemaining"></span>
+            </span>
+          </div>
+          <div class="card-action" id="buttonPause">
+            <button id="pause" class="waves-effect waves-light btn red darken-4">
+              <i class="material-icons left">pause</i>
+              <span>
+                PAUSE
+              </span>
+            </button>
+            <button id="cancel" class="waves-effect waves-light btn red darken-4">
+              <i class="material-icons left">clear</i>
+              <span>
+                CANCEL
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <ul class="collapsible">
+        <li>
+          <div class="collapsible-header"><i class="material-icons">settings</i>Config</div>
+          <div class="collapsible-body">
+            <form id="config">
+              <div class="input-field col">
+                <input type="number" id="exTime" name="exTime" min="1" value="30" />
+                <label for="exTime">Temps d'un exercice <small>(en s)</small></label>
+              </div>
+              <div class="input-field col">
+                <input type="number" id="inBetweenExPause" name="inBetweenExPause" min="1" value="2" />
+                <label for="inBetweenExPause">Pause entre les exercices <small>(en s)</small></label>
+              </div>
+              <div class="input-field col">
+                <input type="number" id="inBetweenRepPause" name="inBetweenRepPause" min="1" value="60" />
+                <label for="inBetweenRunPause">Pause entre les répétitions <small>(en s)</small></label>
+              </div>
+              <div class="input-field col">
+                <input type="number" id="inBetweenRunPause" name="inBetweenRunPause" min="1" value="180" />
+                <label for="inBetweenRunPause">Pause entre les runs <small>(en s)</small></label>
+              </div>
+              <div class="input-field col">
+                <input type="number" id="nbExInRun" name="nbExInRun" min="1" value="3" />
+                <label for="nbExInRun">Nombre d'exercices dans une run</label>
+              </div>
+              <div class="input-field col">
+                <input type="number" id="nbRepInRun" name="nbRepInRun" min="1" value="4" />
+                <label for="nbRepInRun">Nombre de répétition d'une run</label>
+              </div>
+              <div class="input-field col">
+                <input type="number" id="nbRun" name="nbRun" min="1" value="3" />
+                <label for="nbRun">Nombre de run</label>
+              </div>
+            </form>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="timax.js"></script>
+
+</html>
