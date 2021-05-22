@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   /* INIT TIMAX™*/
-  let inBetweenExPause = 2;
+  let inBetweenExPause = 10;
   let inBetweenRepPause = 60;
   let inBetweenRunPause = 180;
   let exTime = 30;
