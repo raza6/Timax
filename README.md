@@ -24,4 +24,5 @@ The configuration panel allows tweaking all of those parameters. The UI is in Fr
 ## Licenses
 - The fonts used are under [OFL](https://choosealicense.com/licenses/ofl-1.1/), credits go to the authors ([Pacifico](https://fonts.google.com/specimen/Pacifico) and [Signika Negative](https://fonts.google.com/specimen/Signika+Negative)).
 - Materialize framework is under [MIT](https://choosealicense.com/licenses/mit/) license.
-- My code is under [The Unlicense](https://choosealicense.com/licenses/unlicense/)
+- Google Material icons are under [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0/) license.
+- My code is under [The Unlicense](https://choosealicense.com/licenses/unlicense/).
