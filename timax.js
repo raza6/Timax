@@ -236,10 +236,6 @@ function prepareNextTick() {
 }
 
 /* UTILS */
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 function blink(times = 1) {
   for (let t = 0; t < times; t++) {
     setTimeout(() => {
