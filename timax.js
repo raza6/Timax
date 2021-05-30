@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
   
 /* INIT TIMAX™*/
+
+//Form var
 let inBetweenExPause = 10;
 let inBetweenRepPause = 60;
 let inBetweenRunPause = 180;
@@ -12,15 +14,18 @@ let exTime = 30;
 let nbExInRun = 3;
 let nbRepInRun = 4;
 let nbRun = 3;
-let timerStruct = [];
-let currentTimingStruct = {};
-let isCancelled = false;
-let isPaused = false;
 let volume = 70;
+
+//Script var
+let timingList = [];
+let currentTimingStatus = {};
+let isPaused = false;
 let beep = new Audio('https://freesound.org/data/previews/180/180821_118393-lq.mp3');
 beep.volume = volume/100;
 let victory = new Audio('https://ia903209.us.archive.org/35/items/GuileTheme/Guile Theme.mp3');
 victory.volume = volume/100;
+let timeOutHandlerRunTimer;
+let timeOutHandlerReset;
 
 const haveATreat = [
   'You did it you crazy son of a bitch !',
@@ -32,8 +37,14 @@ const haveATreat = [
   'You\'re doing fantastically great',
   'You\'re a fucking icon',
   'You\'re to precious for this world'
-]
+];
 
+const timingType = {
+  NONE: undefined,
+  EXERCISE: "ex",
+	SMALL_PAUSE: "smallPause",
+	BIG_PAUSE: "bigPause"
+};
 
 document.getElementById('inBetweenExPause').addEventListener('change', (e) => {
   inBetweenExPause = parseInt(e.target.value);
@@ -64,17 +75,19 @@ document.getElementById('volume').addEventListener('change', (e) => {
 
 /* INIT INTERFACE */
 const launchButton = document.getElementById("launch");
-launchButton.addEventListener('click', (e) => {
+launchButton.addEventListener('click', () => {
   start();
 });
 
 const cancelButton = document.getElementById("cancel");
-cancelButton.addEventListener('click', (e) => {
-  isCancelled = true;
+cancelButton.addEventListener('click', () => {
+  clearTimeout(timeOutHandlerRunTimer);
+  reset();
 });
 
 const pauseButton = document.getElementById("pause");
-pauseButton.addEventListener('click', (e) => {
+pauseButton.addEventListener('click', () => {
+  clearTimeout(timeOutHandlerRunTimer);
   isPaused = !isPaused;
   if (isPaused) {
     pauseButton.children[0].innerText = 'play_arrow';
@@ -82,143 +95,143 @@ pauseButton.addEventListener('click', (e) => {
   } else {
     pauseButton.children[0].innerText = 'pause';
     pauseButton.children[1].innerText = 'PAUSE';
-    playTimer();
+    runTimer();
   }
 });
 
-const display = document.getElementById('timerDisplay');
+const displayTimer = document.getElementById('timerDisplay');
 const displayRemaining = document.getElementById('timerRemaining');
-const switchDisplayNotLaunched = document.getElementById('notLaunched');
-const switchDisplayLaunched = document.getElementById('launched');
+const cardDisplayStatusNotLaunched = document.getElementById('notLaunched');
+const cardDisplayStatusLaunched = document.getElementById('launched');
 const timerBlinker = document.getElementById('timerBlinker');
 
 /* TIMER BEHAVIOR */
-async function start() {
+function reset() {
+  cardDisplayStatusNotLaunched.hidden = false;
+  cardDisplayStatusLaunched.hidden = true;
+  beep.pause();
+  victory.pause();
+  displayTimer.innerText = '0';
+  displayTimer.classList.remove('victory');
+
+  clearTimeout(timeOutHandlerReset);
+  clearTimeout(timeOutHandlerRunTimer);
+
+  timingList = [];
+  currentTimingStatus = {
+    currentSegmentId: 0,
+    currentSegmentRemaining: 0,
+    totalRemaining: 0,
+    specialEvent: timingType.NONE,
+    isEnded: false
+  }
+}
+
+function start() {
   //Make sure were in init position
   reset();
 
-  //Build timerStruct
+  //Build timingList
   for (let run = 0; run < nbRun; run++) {
     for (let rep = 0; rep < nbRepInRun; rep++) {
       for (let ex = 0; ex < nbExInRun; ex++) {
-        timerStruct.push({
+        timingList.push({
           time: inBetweenExPause,
-          type: 'smallPause'
+          type: timingType.SMALL_PAUSE
         });
-        timerStruct.push({
+        timingList.push({
           time: exTime,
-          type: 'ex'
+          type: timingType.EXERCISE
         });
       }
       if (rep < nbRepInRun - 1) {
-        timerStruct.push({
+        timingList.push({
           time: inBetweenRepPause,
-          type: 'bigPause'
+          type: timingType.BIG_PAUSE
         });
       }
     }
     if (run < nbRun - 1) {
-      timerStruct.push({
+      timingList.push({
         time: inBetweenRunPause,
-        type: 'bigPause'
+        type: timingType.BIG_PAUSE
       });
     }
   }
-  console.log(timerStruct);
+  
+  //Build currentTimingStatus
+  currentTimingStatus = {
+    ...currentTimingStatus,
+    currentSegmentId: 0,
+    currentSegmentRemaining: timingList[0].time,
+    totalRemaining: timingList.reduce((a, b) => a + b.time + 1, 0) - 1,
+  }
+  
+  console.log(timingList, currentTimingStatus);
 
   //Switch display
-  switchDisplayNotLaunched.hidden = true;
-  switchDisplayLaunched.hidden = false;
+  cardDisplayStatusNotLaunched.hidden = true;
+  cardDisplayStatusLaunched.hidden = false;
 
   //Start timer
-  playTimer();
+  runTimer();
 }
 
-async function playTimer() {
-  //Run over timerStruct
-  await timerLoop(timerStruct, currentTimingStruct);
-
-  //Reset if exiting timer
-  if (!isPaused) {
-    reset();
-  }
+function runTimer() {
+  timeOutHandlerRunTimer = setTimeout(() => runTimer(), 1000);
+  displayCurrentTiming();
+  prepareNextTick();
 }
 
-async function timerLoop(timings, currentTimingConfig) {
-  let remaining;
-  if (currentTimingConfig.remainingTiming > 0) {
-    remaining = timerStruct.slice(currentTimingConfig.idTiming + 1).reduce((a, b) => a + b.time, 0);
-    remaining += currentTimingConfig.remainingTiming;
-  } else {
-    remaining = timerStruct.slice(currentTimingConfig.idTiming).reduce((a, b) => a + b.time, 0);
-  }
-
-
-  mainLoop:
-    for (let i = currentTimingConfig.idTiming; i < timerStruct.length; i++) { //Loop over each segment
-      let timing = timerStruct[i];
-
-      //Handle special sub-segment
-      let nextCurrentTiming;
-      if (i === currentTimingConfig.idTiming && currentTimingConfig.idTiming > 0) {
-        nextCurrentTiming = currentTimingConfig.remainingTiming;
-      } else {
-        nextCurrentTiming = timing.time;
-      }
-      for (let currentTiming = nextCurrentTiming; currentTiming >= 0; currentTiming--) { //Unwind sub-segment
-        display.innerText = currentTiming;
-        displayRemaining.innerText = new Date(1000 * remaining--).toISOString().substr(11, 8);
-
-        //Cancel
-        if (isCancelled) {
-          isCancelled = false;
-          break mainLoop;
-        }
-
-        //Pause
-        if (isPaused) {
-          currentTimingStruct = {
-            idTiming: i,
-            remainingTiming: currentTiming
-          }
-          console.log(currentTimingStruct);
-
-          break mainLoop;
-        }
-
-        //Trigger alarm
-        if (currentTiming === 0) {
-          if (i < timerStruct.length - 1) {
-            if (timerStruct[i + 1].type === 'smallPause') {
-              blink(1);
-            } else if (timerStruct[i + 1].type === 'ex') {
-              blink(2);
-            } else {
-              blink(3);
-            }
-          } else {
-            victory.play();
-            display.innerText = haveATreat[Math.floor(Math.random() * haveATreat.length)];
-            display.classList.add('victory');
-            await sleep(244000);
-            victory.pause();
-            display.innerText = '0';
-            display.classList.remove('victory')
-          }
-        }
-
-        await sleep(1000);
+function displayCurrentTiming() {
+  if (currentTimingStatus.isEnded) { //Handle end
+    clearTimeout(timeOutHandlerRunTimer);
+    victory.play();
+    displayTimer.innerText = haveATreat[Math.floor(Math.random() * haveATreat.length)];
+    displayTimer.classList.add('victory');
+    timeOutHandlerReset = setTimeout(() => reset(), 244000);
+  } else { // Timer running display
+    displayTimer.innerText = currentTimingStatus.currentSegmentRemaining;
+    displayRemaining.innerText = new Date(1000 * currentTimingStatus.totalRemaining).toISOString().substr(11, 8);
+    if (currentTimingStatus.specialEvent !== timingType.NONE) { //Handle blinking
+      switch(currentTimingStatus.specialEvent) {
+        case timingType.EXERCISE:
+          blink(2);
+          break;
+        case timingType.SMALL_PAUSE:
+          blink(1);
+          break;
+        case timingType.BIG_PAUSE:
+          blink(3);
+          break;
       }
     }
+  }
 }
 
-function reset() {
-  switchDisplayNotLaunched.hidden = false;
-  switchDisplayLaunched.hidden = true;
-  timerStruct = [];
-  currentTimingStruct = {
-    idTiming: 0,
-    remainingTiming: 0
+function prepareNextTick() {
+  if (currentTimingStatus.currentSegmentRemaining > 0) {
+    currentTimingStatus = {
+      ...currentTimingStatus,
+      currentSegmentRemaining: currentTimingStatus.currentSegmentRemaining - 1,
+      totalRemaining: currentTimingStatus.totalRemaining - 1,
+      specialEvent: timingType.NONE
+    }
+  } else { // Next segment
+    if (currentTimingStatus.currentSegmentId < timingList.length - 1) {
+      currentTimingStatus = {
+        currentSegmentId: currentTimingStatus.currentSegmentId + 1,
+        currentSegmentRemaining: timingList[currentTimingStatus.currentSegmentId + 1].time,
+        totalRemaining: currentTimingStatus.totalRemaining - 1,
+        specialEvent: timingList[currentTimingStatus.currentSegmentId + 1].type
+      }
+    } else { // End
+      currentTimingStatus = {
+        ...currentTimingStatus,
+        specialEvent: timingType.NONE,
+        isEnded: true
+      }
+    }
   }
 }
 
