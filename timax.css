@@ -62,6 +62,10 @@ body #config {
   div#buttonPause button {
     margin: 0 10px;
   }
+
+  button[hidden] {
+    display: none;
+  }
   
   span#timerDisplay {
     font-size: 6em;

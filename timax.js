@@ -109,6 +109,7 @@ const timerBlinker = document.getElementById('timerBlinker');
 function reset() {
   cardDisplayStatusNotLaunched.hidden = false;
   cardDisplayStatusLaunched.hidden = true;
+  pauseButton.hidden = false;
   beep.pause();
   victory.pause();
   displayTimer.innerText = '0';
@@ -189,6 +190,7 @@ function displayCurrentTiming() {
     victory.play();
     displayTimer.innerText = haveATreat[Math.floor(Math.random() * haveATreat.length)];
     displayTimer.classList.add('victory');
+    pauseButton.hidden = true;
     timeOutHandlerReset = setTimeout(() => reset(), 244000);
   } else { // Timer running display
     displayTimer.innerText = currentTimingStatus.currentSegmentRemaining;
